@@ -15,13 +15,21 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   chainId */
 
   //well what happens to a chain that doesn't have a priceFeed address?
+  let ethUsdPriceFeedAddress;
 
-  const ethUsdPriceFeed = networkConfig[chainId]["ethUsdPriceFeed"];
+  if (chainId == 31337) {
+    const ethUsdAggregator = await deployments.get("MockV3Aggregator");
+    ethUsdPriceFeedAddress = ethUsdAggregator.address;
+  } else {
+    ethUsdPriceFeedAddress = networkConfig[chainId]["ethUsdPriceFeed"];
+  }
+
   const fundMe = deploy("FundMe", {
     from: deployer,
-    args: [ethUsdPriceFeed],
+    args: [ethUsdPriceFeedAddress],
     log: true,
   });
+  log("--------------------------------------------------------------");
 };
 
-module.exports.tags = ["all", "fund"];
+module.exports.tags = ["all", "fundme"];
